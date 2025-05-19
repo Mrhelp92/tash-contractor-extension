@@ -82,55 +82,69 @@ function runMemberFlow() {
             console.log("⌨️ Focused and clicked search input");
 
             // 👇 Now type the contractor name automatically
-            typeTextSlowly(input, contractorName, () => {
-                console.log("🖋️ Contractor name typed into search field:", contractorName);
+            // 👇 Now fetch the email and type it instead of the name
+            fetch("https://abdelrahman-atm-tash-remove-contractors.hf.space/retrieveEmail", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: contractorName })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const contractorEmail = data?.email || contractorName; // fallback to name
+                console.log("📩 Retrieved contractor email:", contractorEmail);
 
-                // Step 1: Click the dropdown toggle
-                waitForElement(".cu-dropdown__toggle.cu-tms-user-settings-list__ellipsis", (dropdownBtn) => {
-                    dropdownBtn.click();
-                    console.log("🧩 Clicked dropdown toggle");
+                typeTextSlowly(input, contractorEmail, () => {
+                    console.log("🖋️ Email typed into search field:", contractorEmail);
 
-                    // Step 2: Wait for the menu items
-                    waitForElement("a.cu-tms-user-settings-list__item", () => {
-                        const item2 = document.querySelector("a.cu-tms-user-settings-list__item:nth-child(2)");
-                        const item3 = document.querySelector("a.cu-tms-user-settings-list__item:nth-child(3)");
+                    // Step 1: Click the dropdown toggle
+                    waitForElement(".cu-dropdown__toggle.cu-tms-user-settings-list__ellipsis", (dropdownBtn) => {
+                        dropdownBtn.click();
+                        console.log("🧩 Clicked dropdown toggle");
 
-                        const item2Text = item2?.innerText?.trim().toLowerCase() || "";
-                        const item3Text = item3?.innerText?.trim().toLowerCase() || "";
+                        // Step 2: Wait for the menu items
+                        waitForElement("a.cu-tms-user-settings-list__item", () => {
+                            const item2 = document.querySelector("a.cu-tms-user-settings-list__item:nth-child(2)");
+                            const item3 = document.querySelector("a.cu-tms-user-settings-list__item:nth-child(3)");
 
-                        console.log("🔍 Item 2 text:", item2Text);
-                        console.log("🔍 Item 3 text:", item3Text);
+                            const item2Text = item2?.innerText?.trim().toLowerCase() || "";
+                            const item3Text = item3?.innerText?.trim().toLowerCase() || "";
 
-                        if (item2Text === "cancel invite" && typeof item2.click === "function") {
-                            item2.click();
-                            console.log("✅ Clicked 'Cancel Invite' (Item 2)");
-                            showToast(`✅ ${contractorName}'s invite was canceled successfully!`);
-                        } else if (item3Text === "remove" && typeof item3.click === "function") {
-                            item3.click();
-                            console.log("✅ Clicked 'Remove' (Item 3)");
-                            waitForElement("button", (btn) => {
-                                const allButtons = Array.from(document.querySelectorAll("button"));
-                                const removeBtn = allButtons.find(
-                                    b => b.textContent?.trim().toLowerCase() === "remove"
-                                );
+                            console.log("🔍 Item 2 text:", item2Text);
+                            console.log("🔍 Item 3 text:", item3Text);
 
-                                if (removeBtn) {
-                                    removeBtn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-                                    console.log("🟥 Clicked final confirm 'Remove' button");
+                            if (item2Text === "cancel invite" && typeof item2.click === "function") {
+                                item2.click();
+                                console.log("✅ Clicked 'Cancel Invite' (Item 2)");
+                                showToast(`✅ ${contractorName}'s invite was canceled successfully!`);
+                            } else if (item3Text === "remove" && typeof item3.click === "function") {
+                                item3.click();
+                                console.log("✅ Clicked 'Remove' (Item 3)");
+                                waitForElement("button", (btn) => {
+                                    const allButtons = Array.from(document.querySelectorAll("button"));
+                                    const removeBtn = allButtons.find(
+                                        b => b.textContent?.trim().toLowerCase() === "remove"
+                                    );
 
-                                    showToast(`✅ ${contractorName} was fully removed!`);
-                                } else {
-                                    console.warn("❌ Could not find confirm 'Remove' button in modal.");
-                                }
-                            }, "❌ Confirm 'Remove' modal button not found", 20, 500);
+                                    if (removeBtn) {
+                                        removeBtn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+                                        console.log("🟥 Clicked final confirm 'Remove' button");
 
-                            showToast(`✅ ${contractorName}'s invite was canceled successfully!`);
-                        } else {
-                            console.warn("❌ Neither 'Cancel Invite' nor 'Remove' found.");
-                        }
-                    }, "❌ User menu items not found");
+                                        showToast(`✅ ${contractorName} was fully removed!`);
+                                    } else {
+                                        console.warn("❌ Could not find confirm 'Remove' button in modal.");
+                                    }
+                                }, "❌ Confirm 'Remove' modal button not found", 20, 500);
+                            } else {
+                                console.warn("❌ Neither 'Cancel Invite' nor 'Remove' found.");
+                            }
+                        }, "❌ User menu items not found");
 
-                }, "❌ Dropdown icon not found");
+                    }, "❌ Dropdown icon not found");
+                });
+            })
+            .catch(err => {
+                console.error("❌ Failed to fetch email from backend:", err);
+                showToast("❌ Could not fetch email", "#f44336");
             });
 
         }, "❌ Search input not found");
