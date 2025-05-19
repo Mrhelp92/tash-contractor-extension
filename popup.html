@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contractor Manager</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="tabs">
+    <button class="tab-button active" data-tab="addContractor">Add Contractor</button>
+    <button class="tab-button" data-tab="removeContractor">Remove Contractor</button>
+  </div>
+
+  <div id="addContractor" class="tab-content active">
+    <form id="addContractorForm">
+      <div class="form-group">
+        <input type="text" id="contractorName" placeholder="Enter Contractor Name" required />
+      </div>
+      <div class="form-group">
+        <input type="email" id="contractorEmail" placeholder="Enter Contractor Email" required />
+      </div>
+      <div class="form-group">
+        <select id="contractorType" required>
+          <option value="" disabled selected>Select Contractor Type</option>
+          <option value="Image Contractor">Image Contractor</option>
+          <option value="Video Contractor">Video Contractor</option>
+        </select>
+      </div>
+      <button type="submit" id="addContractorBtn">Add Contractor</button>
+    </form>
+  </div>
+
+  <div id="removeContractor" class="tab-content">
+    <form id="removeContractorForm">
+      <div class="form-group">
+        <select id="removeContractorType" required>
+          <option value="" disabled selected>Select Contractor Type</option>
+          <option value="Image Contractor">Image Contractor</option>
+          <option value="Video Contractor">Video Contractor</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <select id="contractorList" required>
+          <option value="">Choose Contractor</option>
+        </select>
+      </div>
+
+      <button type="button" id="removeContractorBtn">Remove Contractor</button>
+    </form>
+  </div>
+
+
+  <script src="popup.js"></script>
+</body>
+</html>

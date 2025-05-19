@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Contractor Manager",
+  "version": "1.0",
+  "description": "Manage contractors by adding and removing them.",
+  "permissions": [
+    "tabs",
+    "scripting",
+    "storage",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://app.clickup.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["postListActions.js", "removeListActions.js", "memberActions.js"],
+      "matches": ["https://app.clickup.com/*"]
+    }
+  ]
+}
