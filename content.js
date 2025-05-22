@@ -16,7 +16,11 @@ function waitForElement(selector, callback, errorMessage, maxAttempts = 10, inte
             attempts++;
             setTimeout(checkElement, interval);
         } else {
-            console.log(`❌ ${errorMessage}`);
+            if (typeof errorMessage === "function") {
+                errorMessage(); // ✅ call the handler if it's a function
+            } else {
+                console.log(`❌ ${errorMessage}`); // otherwise, just log the message
+            }
         }
     };
 
@@ -258,7 +262,17 @@ waitForElement("span.cu2-views-bar__controller-btn__text", (element) => {
                                         }
                                     }, "'Add option' button not found", 30, 500);
                                     }, 3000);
-                                }, "The Sidebar wasnot found", 30, 500);
+                                    
+                                }, () => {
+                                    console.warn("❌ The Sidebar wasnot found. Restarting ClickUp process...");
+
+                                    chrome.runtime.sendMessage({
+                                        action: "openClickUpPage",
+                                        name: window.contractorNameFromExtension,
+                                        email: window.contractorEmailFromExtension,
+                                        type: window.contractorTypeFromExtension
+                                    });
+                                }, 30, 500);
 
                             } else {
                                 console.log(`❌ Edit button for '${contractorLabel}s' not found.`);
